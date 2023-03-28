@@ -1,6 +1,6 @@
 library(tidyverse)
 library(stringr)
-
+## Section to choose the file/filtering
 file4 <- read.csv("/Users/muhammad.zaryab/Desktop/scripts/excelformatting/IGS Q1.csv")
 file4 <- file4 %>% select(Date, Account, Permalink, Campaign, Templates..Outbound.Message., Category..Outbound.Message., Editorial..Outbound.Message., Amazon.Exclusive..Outbound.Message., Amazon.Original..Outbound.Message.,Instagram.Business.Post.Impressions..SUM., PublishedTime)
 file4 <- file4 %>% filter(Campaign == "WHM 2023 (Amazon Music)")
@@ -37,6 +37,7 @@ es <- file2 %>% filter(Account=="amazonmusices")
 fr <- file2 %>% filter(Account=="amazonmusicfr")
 de <- file2 %>% filter(Account=="amazonmusicde")
 
+## From here switch to the new script newexcelscript
 
 
 
