@@ -1,0 +1,64 @@
+
+# assign group IDs based on time differences
+de$time_diff <- as.numeric(de$time_diff)
+#uk$ids <- ifelse(uk$time_diff < 10, cumsum(c(1, diff(uk$time_diff) > 10)), 1)
+
+de$ids <- ifelse(de$time_diff < 10, cumsum(c(TRUE, diff(de$time_diff) > 9)), 1)
+
+# replace values that are not equal to 1 with NA
+de$ids <- ifelse(de$ids != 1, NA, de$ids)
+
+# Replace NA values with consecutive numbers
+# Create a grouping variable based on consecutive values
+# Initialize counter variable
+counter <- 2
+
+# Loop over each row of the dataframe       this works
+for (i in 1:nrow(de)) {
+  
+  # If the current value is NA, replace it with the current counter value and increment the counter
+  if (is.na(de$ids[i])) {
+    de$ids[i] <- counter
+    counter <- counter + 1
+  } else {
+    counter <- 2
+    
+    # If the current value is not NA, reset the counter to 2
+    de$ids[i]
+  }
+}
+
+
+de$finalid <- de$ids
+
+## alt
+
+de <- de %>% select(Date, Account, Permalink, Campaign, Templates..Outbound.Message., Category..Outbound.Message., Editorial..Outbound.Message., Amazon.Exclusive..Outbound.Message., Amazon.Original..Outbound.Message.,Instagram.Business.Post.Impressions..SUM., PublishedTime,finalid)
+
+# create new column
+de$first_post_impressions <- ifelse(de$finalid == 1, de$Instagram.Business.Post.Impressions..SUM., NA)
+
+# replace NAs with previous values
+de$first_post_impressions[1] <- 100
+de$first_post_impressions <- na.locf(de$first_post_impressions)
+
+## completionrate
+de$comprate <- ifelse(de$finalid==1, "", (de$Instagram.Business.Post.Impressions..SUM./de$first_post_impressions)*100)
+
+de$comprate <- as.numeric(de$comprate)
+
+
+
+## get average
+mean(de$comprate, na.rm = TRUE)
+
+
+write_csv(de, "/Users/muhammad.zaryab/Desktop/scripts/excelformatting/Q1de.csv")
+
+## calculating quantiles
+
+# Calculate the values at the 5th and 95th percentiles of comprate
+q <- quantile(uk$comprate, probs = c(0.05, 0.95), na.rm = TRUE)
+
+# Subset the dataframe to remove rows with comprate outside of the 5th and 95th percentiles
+uk_subset <- uk[uk$comprate >= q[1] & uk$comprate <= q[2], ]
